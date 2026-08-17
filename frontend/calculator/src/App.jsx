@@ -9,6 +9,7 @@ import { api } from "./service/api.jsx";
 function App() {
   const [expressao, setExpressao] = useState("");
   const [erro, setErro] = useState(null);
+  const [historico, setHistorico] = useState([]);
 
   function handleButtonClick(valor) {
     if (valor === "C") {
@@ -30,6 +31,7 @@ function App() {
             console.log(response.data);
             const resultadoExpressao = response.data
             setExpressao(formatarResultado(resultadoExpressao.resultado))
+            getHistorico();
           })
           .catch((error) => {
             console.error(error);
@@ -61,6 +63,16 @@ function App() {
     return "bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-500 transition-colors duration-250";
   }
 
+  function getHistorico() {
+    api.get("/historico")
+    .then((response) => {
+      setHistorico(response.data)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+  }
+
   return (
     <>
       <div className="bg-gray-900 p-4 rounded-lg shadow-md flex flex-col items-center justify-center min-h-screen">
@@ -68,7 +80,7 @@ function App() {
           Calculadora
         </h1>
         <div className="flex flex-row">
-          <div className="flex flex-col items-center justify-center shadow-lg bg-zinc-900 p-4 rounded-4xl shadow-black/40">
+          <div className="flex flex-col items-center justify-start shadow-lg bg-zinc-900 p-4 rounded-4xl shadow-black/40 h-fit">
             <Display expressao={expressao} />
             {erro && <p className="text-red-500 m-4 mt-0">{erro}</p>}
             <ButtonPad
@@ -77,7 +89,7 @@ function App() {
             />
           </div>
           <div>
-            <Card />
+            <Card historico={historico}/>
           </div>
         </div>
       </div>
