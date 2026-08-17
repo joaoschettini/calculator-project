@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/historico")
 public class HistoricoController {
 
     private final HistoricoService service;
+
+
 
     @PostMapping
     @ApiResponse(responseCode = "201", description = "Histórico criado com sucesso")
