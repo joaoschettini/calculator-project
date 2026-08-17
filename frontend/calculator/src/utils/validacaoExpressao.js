@@ -8,7 +8,7 @@ export function tipoDoCaractere(char) {
   if (/[+\-*/]/.test(char)) return "OPERADOR";
   if (char === "(") return "ABRE_PARENTESE";
   if (char === ")") return "FECHA_PARENTESE";
-  if (char === ",") return "PONTO";
+  if (char === ".") return "PONTO";
   return "DESCONHECIDO";
 }
 
@@ -37,7 +37,7 @@ export function podeAdicionar(expressaoAtual, novoChar) {
     return mensagemErro("Operandor necessário após parêntese fechado!");
   }
 
-  if (tipoUltimo === "ABRE_PARENTESE" && (tipoNovo === "OPERADOR" || tipoNovo === "FECHA_PARENTESE")) {
+  if (tipoUltimo === "ABRE_PARENTESE" && novoChar !== "-" && (tipoNovo === "OPERADOR" || tipoNovo === "FECHA_PARENTESE")) {
     return mensagemErro("Não é permitido operador ou parêntese vazio!");
   }
 
@@ -51,7 +51,7 @@ export function podeAdicionar(expressaoAtual, novoChar) {
 
   if (tipoNovo === "PONTO") {
     const ultimoNumero = expressaoAtual.split(/[\+\-\*\/\(\)]/).pop();
-    if (ultimoNumero.includes(",")) {
+    if (ultimoNumero.includes(".")) {
       return mensagemErro("Número já possui um ponto decimal!");
     }
   }
@@ -78,4 +78,15 @@ export function expressaoValida(expressao) {
   }
   
   return null;
+}
+
+export function formatarResultado(numero) {
+   const valorNumerico = Number(numero); // força conversão pra number de verdade, mesmo se vier como string
+  
+  if (isNaN(valorNumerico)) {
+    return mensagemErro("Não é um número válido"); // proteção caso venha algo que não é número
+  }
+  
+  const arredondado = parseFloat(valorNumerico.toFixed(10)); // corrige imprecisão de float
+  return arredondado.toString();
 }

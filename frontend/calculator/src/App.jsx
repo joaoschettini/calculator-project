@@ -2,10 +2,9 @@ import "./App.css";
 import { useState } from "react";
 import ButtonPad from "./components/ButtonPad.jsx";
 import Display from "./components/Display.jsx";
-import {
-  podeAdicionar,
-  expressaoValida
-} from "./utils/validacaoExpressao";
+import Card from "./components/Card.jsx";
+import { podeAdicionar, expressaoValida, formatarResultado } from "./utils/validacaoExpressao";
+import { api } from "./service/api.jsx";
 
 function App() {
   const [expressao, setExpressao] = useState("");
@@ -24,7 +23,17 @@ function App() {
         setErro(resultado);
       } else {
         setErro(null);
-        // logica louca
+        api.post("/calcular", {
+            expressao: expressao,
+          })
+          .then((response) => {
+            console.log(response.data);
+            const resultadoExpressao = response.data
+            setExpressao(formatarResultado(resultadoExpressao.resultado))
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       }
     } else {
       const resultado = podeAdicionar(expressao, valor);
@@ -42,28 +51,35 @@ function App() {
 
   function handleButtonColor(valor) {
     if (valor === "=" || valor === "C") {
-      return "bg-orange-600 text-white px-6 py-2 rounded";
+      return "bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-400 transition-colors duration-250";
     }
 
     if (valor >= "0" && valor <= "9") {
-      return "bg-blue-800 text-white px-6 py-2 rounded";
+      return "bg-blue-800 text-white px-6 py-2 rounded hover:bg-blue-500 transition-colors duration-250";
     }
 
-    return "bg-gray-700 text-white px-6 py-2 rounded";
+    return "bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-500 transition-colors duration-250";
   }
 
   return (
     <>
-      <div className="bg-zinc-900 p-4 rounded-lg shadow-md flex flex-col items-center justify-center min-h-screen">
+      <div className="bg-gray-900 p-4 rounded-lg shadow-md flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-3xl text-white font-bold justify-center items-center m-2 flex">
           Calculadora
         </h1>
-        <Display expressao={expressao} />
-        {erro && <p className="text-red-500 m-4 mt-0">{erro}</p>}
-        <ButtonPad
-          onButtonClick={handleButtonClick}
-          buttonColor={handleButtonColor}
-        />
+        <div className="flex flex-row">
+          <div className="flex flex-col items-center justify-center shadow-lg bg-zinc-900 p-4 rounded-4xl shadow-black/40">
+            <Display expressao={expressao} />
+            {erro && <p className="text-red-500 m-4 mt-0">{erro}</p>}
+            <ButtonPad
+              onButtonClick={handleButtonClick}
+              buttonColor={handleButtonColor}
+            />
+          </div>
+          <div>
+            <Card />
+          </div>
+        </div>
       </div>
     </>
   );
